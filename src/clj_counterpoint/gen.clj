@@ -18,7 +18,7 @@
   ([melody] ; when given just the melody, takes the starting note as the starting harmony note
    (generator melody (first melody)))
   ([melody harmony] ; where the real fun happens
-   (let [hist (get-hist harmony)]
+   (let [hist (get-hist harmony 3)]
      (cons harmony
            (lazy-seq
             (->>
@@ -32,35 +32,53 @@
 
 #_(println (take 4 (generator [75 79 78 70 71 73])))
 
-(defn get-hist
-  ""
-  [harmony]
-  ())
+(defn- get-hist
+  "returns the most recent (up to) [num] notes in [harmony]"
+  [harmony num]
+  (take-last num harmony))
 
-(defn get-contour
-  ""
+(defn- get-contour
+  "determines whether [hist] contains a melodic contour, and if so, what it is.
+  (^^)=2   (^-)= 1   (^v) = 0   (v-) = -1 (vv) = -2"
   [hist]
   ())
 
-(defn new-contour
-  ""
-  [foo]
+(defn- new-contour
+  "determines which direction the new step will go in.
+  the number passed affects the probability of a given direction.
+  direction is returned as 1, -1, or 0"
+  [prev-direction]
   ())
 
-(defn new-cu-step
-  ""
-  [foo]
-  ())
+(defn- new-cu-step
+  "chooses a step size, in 'consonant units'"
+  [direction]
+  (let [n (rand 20)]
+    (->>
+     (cond
+       (n < 10) 1
+       (n < 16) 2
+       (n < 19) 3
+       (n < 20) 4)
+     (* direction))))
 
-(defn new-step
-  ""
-  [foo bar]
-  ())
+(defn- new-step
+  "takes step size in cu and translates to midi steps, based on consonances with the current melody note"
+  [m-note step]
+  (case step
+    0 (step) ; if step is 0, do nothing
+    (->>
+     (Math/abs step)
+     (nth [2 4 5 7])
+     (* (Math/pow step 0 ))))) ; multiplies step size by positive or negative one
+;;in western counterpoint, consonant intervals are:
+;; 3rd  5th  6th  8th
+;; 2    4    5    7
 
-(defn apply-step
-  ""
-  [foo bar]
-  )
+(defn- apply-step
+  "applies step to most recent harmony note"
+  [harmony step]
+  (+ harmony step))
 
 (defn -main []
   ())
