@@ -8,7 +8,8 @@
   (let [cnt (count melody)]
     (take cnt (generator melody))))
 
-#_(generate-harmony [67 67 45 56 67 78 77 66 65 66])
+#_(def h (generate-harmony (seq '(67 67 45 56 67 78 77 66 65 66))))
+#_(println (last h))
 
 (defn- generator
   "I need to know:
@@ -16,7 +17,7 @@
     current melody note *for each harmony item
     harmony vector"
   ([melody] ; when given just the melody, takes the starting note as the starting harmony note
-   (generator melody (first melody)))
+   (generator melody (cons (first melody) ())))
   ([melody harmony] ; where the real fun happens
    (let [hist (get-hist harmony 3)]
      (cons harmony
@@ -24,18 +25,18 @@
             (->>
              hist
              (get-contour)
-             (new-contour)
+             (new-contour (- (count hist) 1))
              (new-cu-step)
              (new-step (peek melody))
              (apply-step harmony)
              (generator melody)))))))
 
-#_(println (take 4 (generator [75 79 78 70 71 73])))
+#_(println (take 10 (generator (seq '(1 2 3 4 5 6 7 8 9 10)))))
 
 (defn- get-hist
   "returns the most recent (up to) [num] notes in [harmony]"
   [harmony num]
-  (take-last num harmony))
+  (take 3 harmony))
 
 (defn- get-contour
   "determines whether [hist] contains a melodic contour, and if so, what it is.
@@ -44,25 +45,24 @@
   (let [len (count hist)]
     (loop [i 1 hist hist sum 0] ; i = 1 because we don't care about just the first value; only pairs
       (if (< i len)
-        (let [now  (peek hist)
-              next (peek (pop hist))
-              ignoreme (prn "now: " now)
-              ignoreme (prn "next: " next)
-              ignoreme (prn "sum: " sum)]
+        (let [now  (first hist)
+              ignoreme (prn (type now))
+              next (first (rest hist))
+              ignoreme (prn (type next))]
           (->>
            (cond
              (< now next)  1
              (> now next) -1
              :else         0)
            (+ sum)
-           (recur (inc i) (rest hist)))) sum))))
+           (recur (inc i) (rest hist))))))))
 
 (defn- new-contour
   "determines which direction the new step will go in.
   the number passed affects the probability of a given direction.
   direction is returned as 1, -1, or 0"
-  [prev-direction]
-  ())
+  [prob-size prev-direction]
+  -1)
 
 (defn- new-cu-step
   "chooses a step size, in 'consonant units'.
@@ -71,11 +71,12 @@
   (let [n (rand 25)]
     (->>
      (cond
-       (n <  5) 0
-       (n < 15) 1
-       (n < 21) 2
-       (n < 24) 3
-       (n < 25) 4)
+       (< n  5) 0
+       (< n 15) 1
+       (< n 21) 2
+       (< n 24) 3
+       (< n 25) 4
+       :else    nil)
      (* direction))))
 
 (defn- new-step
@@ -94,7 +95,7 @@
 (defn- apply-step
   "applies step to most recent harmony note"
   [harmony step]
-  (+ harmony step))
+  (conj harmony step))
 
 (defn -main []
   ())
