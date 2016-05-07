@@ -1,7 +1,8 @@
 (ns clj-counterpoint.core
-  (:gen-class))
-
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (println "Hello, World!"))
+  [:use
+   [overtone.live]
+   [overtone.inst.piano]]
+  [:require
+   [clj-counterpoint.gen :as gen]
+   [mud.core :as mud]
+   [mud.timing :as time]])
