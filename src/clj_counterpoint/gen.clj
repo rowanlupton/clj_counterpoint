@@ -15,10 +15,9 @@
     history of the harmony
     current melody note *for each harmony item
     harmony vector"
-  ([melody]
+  ([melody] ; when given just the melody, takes the starting note as the starting harmony note
    (generator melody (first melody)))
-  ([melody harmony]
-   #_(println "made it this far")
+  ([melody harmony] ; where the real fun happens
    (let [hist (get-hist harmony)]
      (cons harmony
            (lazy-seq
