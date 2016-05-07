@@ -41,7 +41,21 @@
   "determines whether [hist] contains a melodic contour, and if so, what it is.
   (^^)=2   (^-)= 1   (^v) = 0   (v-) = -1 (vv) = -2"
   [hist]
-  ())
+  (let [len (count hist)]
+    (loop [i 1 hist hist sum 0] ; i = 1 because we don't care about just the first value; only pairs
+      (if (< i len)
+        (let [now  (peek hist)
+              next (peek (pop hist))
+              ignoreme (prn "now: " now)
+              ignoreme (prn "next: " next)
+              ignoreme (prn "sum: " sum)]
+          (->>
+           (cond
+             (< now next)  1
+             (> now next) -1
+             :else         0)
+           (+ sum)
+           (recur (inc i) (rest hist)))) sum))))
 
 (defn- new-contour
   "determines which direction the new step will go in.
@@ -51,7 +65,8 @@
   ())
 
 (defn- new-cu-step
-  "chooses a step size, in 'consonant units'"
+  "chooses a step size, in 'consonant units'.
+  probabilities are weighted inside the cond"
   [direction]
   (let [n (rand 25)]
     (->>
