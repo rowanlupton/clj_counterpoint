@@ -66,12 +66,12 @@
 (defn- new-step
   "takes step size in cu and translates to midi steps, based on consonances with the current melody note"
   [m-note step]
-  (let [sign (Math/pow step 0)])
-  (->>
-   (Math/abs step)
-   (nth [0 2 4 5 7])
-   (* sign) ; multiplies step size by positive or negative one
-   (+ m-note)))
+  (let [sign (Math/pow step 0)]
+    (->>
+     (Math/abs step)
+     (nth [0 2 4 5 7])
+     (* sign) ; multiplies step size by positive or negative one
+     (+ m-note))))
 ;;in western counterpoint, consonant intervals are:
 ;; 3rd  5th  6th  8th
 ;; 2    4    5    7
