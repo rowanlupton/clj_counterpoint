@@ -7,7 +7,7 @@
   "takes a melody and returns a harmony"
   [melody]
   (let [cnt (count melody)]
-    (reverse (take cnt (generator melody)))))
+    (reverse (last (take cnt (generator melody))))))
 
 #_(println (generate-harmony (seq '(67 67 45 56 67 78 77 66 65 66))))
 #_(println h)
