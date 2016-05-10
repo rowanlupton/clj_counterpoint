@@ -28,7 +28,9 @@
              (new-cu-step)
              (new-step (peek melody))
              (apply-step harmony)
-             (generator melody)))))))
+             (recur melody)))))))
+;;intead of calling generator, a call to recur
+;;also! consider map, filter, etc
 
 #_(println (take 10 (generator (seq '(1 2 3 4 5 6 7 8 9 10)))))
 
@@ -72,17 +74,22 @@
   the number passed affects the probability of a given direction.
   direction is returned as 1, 0, or -1"
   [prev-contour]
-  (let [s (get-sign prev-contour)]
-    #_(prn "NEW-CONTOUR    prev-contour" prev-contour)
-    (->>
-     (case s
-       0 (+ s 3)
-       (* s 3))
-     (+ prev-contour)
-     (rand-int)
-     (- s)
-     (get-sign))))
-(new-contour 1)
+  (case (rand 6)
+    0 0
+    1 0
+    2 0
+    3 0
+    4 0
+    (let [s (get-sign prev-contour)]
+      #_(prn "NEW-CONTOUR    prev-contour" prev-contour)
+      (->>
+       (case s
+         0 (+ s 3)
+         (* s 3))
+       (+ prev-contour)
+       (rand-int)
+       (- s)
+       (get-sign)))))
 
 (defn- new-cu-step
   "chooses a step size, in 'consonant units'.
@@ -101,6 +108,13 @@
        :else    nil)
      (* direction))))
 
+(defn- make-steps
+  "generate possible harmony steps, based on the melody"
+  [m-note]
+  (conj (map #(mod (- m-note %) 12)
+            [2 4 5 7]) 0))
+;;[2 4 5 7 0]
+
 (defn- new-step
   "takes step size in cu and translates to midi steps, based on consonances with the current melody note
   returns: "
@@ -110,13 +124,12 @@
   (let [sign (get-sign step)]
     (->>
      (math/abs step)
-     (nth [0 2 4 5 7])
+     (nth (make-steps m-note))
      (* sign) ; multiplies step size by positive or negative one
      )))
 ;;in western counterpoint, consonant intervals are:
 ;; 3rd  5th  6th  8th
 ;; 2    4    5    7
-(new-step 56 2)
 
 (defn- apply-step
   "applies step to most recent harmony note"
